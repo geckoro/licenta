@@ -1,0 +1,23 @@
+@color: #EF592B;
+@background-color: #000000;
+@outer-wrapper-width: 25px;
+@outer-wrapper-height: 25px;
+
+#divAbout {
+    color: @color;
+    background-color: @background-color;
+ }
+ 
+ .dimensions(@height: 50px; @width: 30px) {
+    height: @height;
+    width: @width;
+    #divAbout;
+ }
+ 
+ .outer-wrapper {
+    .dimensions(@outer-wrapper-width; @outer-wrapper-height);
+ }
+ 
+ .inner-wrapper {
+    .dimensions();
+ }

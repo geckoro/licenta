@@ -1,0 +1,16 @@
+#divAbout {
+  color: #EF592B;
+  background-color: #000000;
+}
+.outer-wrapper {
+  height: 25px;
+  width: 25px;
+  color: #EF592B;
+  background-color: #000000;
+}
+.inner-wrapper {
+  height: 50px;
+  width: 30px;
+  color: #EF592B;
+  background-color: #000000;
+}
