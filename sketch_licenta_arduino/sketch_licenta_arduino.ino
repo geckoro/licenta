@@ -13,16 +13,6 @@
 #define MOTOR_relay1 5
 #define MOTOR_relay2 6
 
-/* Constants */
-const int remoteKey = 8;
-const int buzzerPin = 3;
-const byte IR_RECEIVE_PIN = 12;
-const int joystickHorizontalPin = A5;
-const int joystickVerticalPin = A4;
-const int joystickButtonPin = 4;
-const int engineLedPin = 7;
-const int obstacleLedPin = 6;
-
 /* Variables */
 int decodedRemoteKey = 0;
 
@@ -61,6 +51,7 @@ class MyMotor {
           digitalWrite(MOTOR_relay2, HIGH);
           obstacleFound = false;
           Serial.println("backward");
+          Serial.print("00\n");
           break;
       }
     }
@@ -83,14 +74,14 @@ class MyMotor {
       }
       else {
         switch (input[0]) {
-          case '1':
+          case '2':
             if (obstacleFound) {
               m_direction = NONE;
               break;
             }
             m_direction = FORWARD;
             break;
-          case '3':
+          case '5':
             m_direction = BACKWARD;
             break;
           default:
@@ -194,22 +185,13 @@ void setup() {
   pinMode(MOTOR_relay2, OUTPUT);
   digitalWrite(MOTOR_relay1, LOW);
   digitalWrite(MOTOR_relay2, LOW);
-
-  pinMode(joystickHorizontalPin, INPUT);
-  pinMode(joystickVerticalPin, INPUT);
-  pinMode(joystickButtonPin, INPUT_PULLUP);
-  pinMode(buzzerPin, OUTPUT);
-
-  pinMode(engineLedPin, OUTPUT);
-  pinMode(obstacleLedPin, OUTPUT);
-
-  IrReceiver.begin(IR_RECEIVE_PIN);
 }
 
 void loop() {
   if (!obstacleFound) {
     if (isObstacleAhead()) {
       obstacleFound = true;
+      Serial.print("01\n");
     }
   }
 
@@ -217,9 +199,6 @@ void loop() {
   processNewData();
 
   myMotor.ProcessInput(receivedChars);
-  
-  digitalWrite(MOTOR_relay1, LOW);
-  digitalWrite(MOTOR_relay2, LOW);
 }
 
 void recvWithEndMarker() {
@@ -269,5 +248,5 @@ bool isObstacleAhead() {
   // Calculating the distance
   int distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
   // Displays the distance on the Serial Monitor
-  return distance < 7;
+  return distance < 10;
 }

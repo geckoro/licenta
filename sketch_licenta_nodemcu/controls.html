@@ -20,8 +20,8 @@
             --presets-dropdown-height: 3vh;
             --presets-dropdown-width: 18em;
             --presets-name-font-size: 1em;
-            --presets-height: 3vh;
-            --presets-width: 17em;
+            --presets-name-height: 3vh;
+            --presets-name-width: 17em;
         }
 
 
@@ -37,8 +37,8 @@
                 --presets-dropdown-height: 5vh;
                 --presets-dropdown-width: 10em;
                 --presets-name-font-size: 2em;
-                --presets-height: 5vh;
-                --presets-width: 9em;
+                --presets-name-height: 5vh;
+                --presets-name-width: 9em;
             }
         }
 
@@ -74,7 +74,6 @@
             align-items: center;
             flex-direction: column;
             margin-left: 2em;
-            margin-top: 3em;
         }
 
         .arrow {
@@ -85,25 +84,16 @@
             display: inline-block;
         }
 
-        .arrow-topleft {
-            border-right: var(--arrow-size) solid transparent;
-            border-top: var(--arrow-size) solid var(--arrow-color);
-        }
-
         .arrow-top {
             border-left: var(--arrow-size) solid transparent;
             border-right: var(--arrow-size) solid transparent;
             border-bottom: var(--arrow-size) solid var(--arrow-color);
         }
 
-        .arrow-topright {
-            border-left: var(--arrow-size) solid transparent;
-            border-top: var(--arrow-size) solid var(--arrow-color);
-        }
-
-        .arrow-bottomleft {
-            border-right: var(--arrow-size) solid transparent;
-            border-bottom: var(--arrow-size) solid var(--arrow-color);
+        .arrow-right {
+            border-left: var(--arrow-size) solid var(--arrow-color);
+            border-top: var(--arrow-size) solid transparent;
+            border-bottom: var(--arrow-size) solid transparent;
         }
 
         .arrow-bottom {
@@ -112,9 +102,10 @@
             border-top: var(--arrow-size) solid var(--arrow-color);
         }
 
-        .arrow-bottomright {
-            border-left: var(--arrow-size) solid transparent;
-            border-bottom: var(--arrow-size) solid var(--arrow-color);
+        .arrow-left {
+            border-top: var(--arrow-size) solid transparent;
+            border-right: var(--arrow-size) solid var(--arrow-color);
+            border-bottom: var(--arrow-size) solid transparent;
         }
 
         .circle {
@@ -136,18 +127,11 @@
             background-color: var(--button-color);
             vertical-align: middle;
             text-align: center;
+            display: table-cell;
             padding: var(--button-padding);
             margin: calc(var(--button-size) / 10);
             border-radius: 0.5em;
             cursor: pointer;
-        }
-
-        .buttons-top {
-            display: flex;
-        }
-
-        .buttons-bottom {
-            display: flex;
         }
 
         .button:active {
@@ -163,7 +147,9 @@
             background-color: var(--disabled-color);
         }
 
-        .gray-textarea {
+        #presets-name {
+            width: var(--presets-name-width);
+            height: var(--presets-name-height);
             padding-inline: 0.5em;
             background-color: rgb(52, 52, 52);
             color: var(--arrow-color);
@@ -172,24 +158,6 @@
             font-weight: bold;
             margin-bottom: 1em;
             border: 1px solid var(--border-color);
-        }
-
-        #presets-name {
-            width: var(--presets-width);
-            height: var(--presets-height);
-        }
-
-        #presets-inputs {
-            width: var(--presets-width);
-            height: calc(var(--presets-height) * 3);
-        }
-
-        #pressed-input {
-            width: calc(var(--presets-width) / 3);
-            height: var(--presets-height);
-            line-height: var(--presets-height);
-            text-align: center;
-            margin: 1.5em 0 0 0;
         }
 
         #presets-name:disabled {
@@ -263,41 +231,31 @@
             <div id="alert">
                 <h2 style="color: red;">Obstacle detected!</h2>
             </div>
-            <div class="buttons-top">
-                <div class="button" id="button-topleft">
-                    <div class="arrow arrow-topleft"></div>
+            <div class="button" id="button-top">
+                <div class="arrow arrow-top"></div>
+            </div>
+            <div class="direction-buttons">
+                <div class="button button-directional" id="button-left">
+                    <div class="arrow arrow-left"></div>
                 </div>
-                <div class="button" id="button-top">
-                    <div class="arrow arrow-top"></div>
-                </div>
-                <div class="button" id="button-topright">
-                    <div class="arrow arrow-topright"></div>
+                <div class="button button-directional" id="button-right">
+                    <div class="arrow arrow-right"></div>
                 </div>
             </div>
-            <div class="buttons-bottom">
-                <div class="button" id="button-bottomleft">
-                    <div class="arrow arrow-bottomleft"></div>
-                </div>
-                <div class="button" id="button-bottom">
-                    <div class="arrow arrow-bottom"></div>
-                </div>
-                <div class="button" id="button-bottomright">
-                    <div class="arrow arrow-bottomright"></div>
-                </div>
+            <div class="button" id="button-bottom">
+                <div class="arrow arrow-bottom"></div>
             </div>
             <div class="function-buttons">
                 <div class="button" id="button-record" onclick="toggleRecording(this, this.children[0].classList)">
                     <div class="circle toggle-recording"></div>
                 </div>
             </div>
-            <textarea cols="10" rows="1" id="pressed-input" class="gray-textarea" disabled
-                title="Pressed time (realtime)">...</textarea>
         </div>
         <div id="presets">
-            <input id="presets-name" class="gray-textarea" autocomplete="off" title="Name for the preset"></input>
-            <textarea cols="40" rows="5" id="presets-inputs" class="gray-textarea" disabled
-                title="Inputs for the selected preset">...</textarea>
-            <select id="presets-dropdown" onclick="onClickSelect()"></select>
+            <input id="presets-name">
+            </input>
+            <select id="presets-dropdown">
+            </select>
             <div class="button" id="button-send">
                 SEND
             </div>
@@ -305,27 +263,6 @@
     </div>
 
     <script>
-        // buttons have the following id's
-        //  - topleft       : 1
-        //  - top           : 2
-        //  - topright      : 3
-        //  - bottomleft    : 4
-        //  - bottom        : 5
-        //  - bottomright   : 6
-
-        // declaring elements
-        var presetName = document.getElementById('presets-name');
-        var select = document.getElementById('presets-dropdown');
-        var presetInputs = document.getElementById('presets-inputs');
-        var pressedInput = document.getElementById('pressed-input');
-        var buttonRecord = document.getElementById('button-record');
-        var buttonSend = document.getElementById('button-send');
-    
-        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-        // global status
-        var status = "none";
-
         // collection of saved presets
         var presets = [{
             "text": "Select a preset...",
@@ -340,83 +277,66 @@
         var timer = 0,
             timerInterval,
             requestInterval,
-            button,
-            buttonId;
-
-        // declaring a timeout, so we can clear it when we don't want the button to be held pressed
-        var inputPressedTimeout;
-
+            button;
         // querying all the buttons
         var buttons = document.querySelectorAll('.button');
-        var pressedInput = document.getElementById('pressed-input');
-
-        var sendButton = document.getElementById('button-send');
-        sendButton.addEventListener('click', (e) => {
-            if (!isDisabled(sendButton)) {
-                sendPreset(presetInputs.value);
-            }
-        });
-
-        var event = isMobile ? 'touchstart' : 'mousedown';
         // adding the event listener by looping
         buttons.forEach(element => {
-            element.addEventListener('touchstart', (e) => {
-                buttonPressedEvent(element, e);
-            });
-        });
-        event = isMobile ? 'touchend' : 'mouseup';
-        // event on mouse up
-        document.addEventListener('touchend', (e) => {
-            buttonReleasedEvent(e);
-        });
-
-        function buttonPressedEvent(element, e) {
-            // reset the timer
-            timer = 0;
-            // remembering the button that has been pressed
-            button = e;
-            buttonId = button.toElement.id.split('-')[1];
-
-            if (isNotFunctionalButton(buttonId) && !isDisabled(element)) {
+            element.addEventListener('mousedown', (e) => {
+                // reset the timer
+                timer = 0;
+                // remembering the button that has been pressed
+                button = e;
                 timerInterval = setInterval(function () {
                     timer += 0.1;
-                    // check if it's not a functional button
-
-                    pressedInput.value = timer.toFixed(1) + "s";
-
                 }, 100);
+                requestInterval = setInterval(function () {
+                    var buttonId = button.toElement.id.split('-')[1];
+                    // check if it's not a functional button
+                    if (buttonId !== undefined) {
+                        switch (buttonId) {
+                            case "top":
+                                request(1, "inputPressed");
+                                break;
+                            case "right":
+                                request(2, "inputPressed");
+                                break;
+                            case "bottom":
+                                request(3, "inputPressed");
+                                break;
+                            case "left":
+                                request(4, "inputPressed");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }, 1000);
+            });
+        });
 
-                sendInput();
-            }
-        }
-
-        function buttonReleasedEvent(e) {
+        // event on mouse up
+        document.addEventListener('mouseup', (e) => {
             // check if a button has been pressed
             if (button !== undefined) {
                 clearInterval(timerInterval);
-                clearTimeout(inputPressedTimeout);
                 clearInterval(requestInterval);
                 // get the button id
-                buttonId = button.toElement.id.split('-')[1];
-                if (isNotFunctionalButton(buttonId) && !isDisabled(e.target)) {
+                var buttonId = button.toElement.id.split('-')[1];
+                // check if it's not a functional button
+                if (buttonId !== undefined) {
                     switch (buttonId) {
-                        case "topleft":
-                            xhrRequest(`/inputReleased?button=1&time=0`)
-                            break;
                         case "top":
-                            xhrRequest(`/inputReleased?button=2&time=0`)
+                            request(1, "inputReleased");
                             break;
-                        case "topright":
-                            xhrRequest(`/inputReleased?button=3&time=0`)
-                            break;
-                        case "bottomleft":
-                            xhrRequest(`/inputReleased?button=4&time=0`)
+                        case "right":
+                            request(2, "inputReleased");
                             break;
                         case "bottom":
-                            xhrRequest(`/inputReleased?button=5&time=0`)
+                            request(3, "inputReleased");
                             break;
-                        case "bottomright":
-                            xhrRequest(`/inputReleased?button=6&time=0`)
+                        case "left":
+                            request(4, "inputReleased");
                             break;
                         default:
                             break;
@@ -431,84 +351,28 @@
                 timer = 0;
                 button = undefined;
             }
-        }
+        });
 
-        function sendPreset(preset) {
-            status = "sent";
-            var totalTime = calculateTotalTime(preset);
-            toggleButtons(false);
-            togglePresetsFunctionality(false);
-            setTimeout(function () {
-                xhrRequest(`/input?preset=${encodePreset(preset)}`);
-                toggleButtons(true)
-                togglePresetsFunctionality(true);
-                status = "none";
-            }, (totalTime + 1) * 1000);
-        }
-
-        function sendInput() {
-            if (isNotFunctionalButton(buttonId)) {
-                switch (buttonId) {
-                    case "topleft":
-                        xhrRequest(`/inputPressed?button=1&time=0`)
-                        break;
-                    case "top":
-                        xhrRequest(`/inputPressed?button=2&time=0`)
-                        break;
-                    case "topright":
-                        xhrRequest(`/inputPressed?button=3&time=0`)
-                        break;
-                    case "bottomleft":
-                        xhrRequest(`/inputPressed?button=4&time=0`)
-                        break;
-                    case "bottom":
-                        xhrRequest(`/inputPressed?button=5&time=0`)
-                        break;
-                    case "bottomright":
-                        xhrRequest(`/inputPressed?button=6&time=0`)
-                        break;
-                    default:
-                        break;
-                }
-            }
-            inputPressedTimeout = setTimeout(sendInput, 1000);
-        }
-
-        function xhrRequest(path) {
+        function request(button, endpoint = "input", time = 0) {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", path, true);
+            xhr.open("GET", `/${endpoint}?button=${button}&time=${time}`, true);
             xhr.send();
         }
 
-        function calculateTotalTime(preset) {
-            var times = preset.replaceAll('topleft', '')
-                .replaceAll('top', '')
-                .replaceAll('topright', '')
-                .replaceAll('bottomleft', '')
-                .replaceAll('bottom', '')
-                .replaceAll('bottomright', '')
-                .replaceAll('-', '')
-                .split(' ');
-            return times.reduce((a, b) => parseFloat(a) + parseFloat(b), 0).toFixed(1);
+        function onArrowTop(time) {
+            request(1, time);
         }
 
-        function encodePreset(preset) {
-            return preset.replaceAll('topleft', '1')
-                .replaceAll('top', '2')
-                .replaceAll('topright', '3')
-                .replaceAll('bottomleft', '4')
-                .replaceAll('bottom', '5')
-                .replaceAll('bottomright', '6')
-                .replaceAll(' ', '_')
-                .replaceAll('.', '');
+        function onArrowRight(time) {
+            request(2, time);
         }
 
-        function isDisabled(button) {
-            return button.classList.contains("disabled");
+        function onArrowBottom(time) {
+            request(3, time);
         }
 
-        function isNotFunctionalButton(buttonId) {
-            return buttonId !== undefined && buttonId !== "record" && buttonId !== "send";
+        function onArrowLeft(time) {
+            request(4, time);
         }
 
         function toggleRecording(element, elementClassList) {
@@ -517,13 +381,15 @@
             }
 
             if (elementClassList.value.includes("toggle-recording")) {
-                togglePresetsFunctionality(false);
+                togglePresetsFunctionality(true);
                 recording = true;
             } else {
-                var name = presetName.value;
-                togglePresetsFunctionality(true);
+                var name = document.getElementById('presets-name').value;
+
+                togglePresetsFunctionality(false);
                 recording = false;
                 addPreset(name, inputs);
+                console.log(inputs);
                 inputs = [];
             }
             elementClassList.toggle('toggle-recording');
@@ -536,18 +402,14 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
                     if (xhr.status == 200) {
+                        console.log(xhr.responseText);
+
                         if (xhr.responseText == "false") {
                             document.getElementById("alert").style.visibility = "hidden";
-                            if (status != "sent") {
-                                document.getElementById("button-topleft").classList.remove("disabled");
-                                document.getElementById("button-top").classList.remove("disabled");
-                                document.getElementById("button-topright").classList.remove("disabled");
-                            }
+                            document.getElementById("button-top").classList.remove("disabled");
                         } else if (xhr.responseText == "true") {
                             document.getElementById("alert").style.visibility = "visible";
-                            document.getElementById("button-topleft").classList.add("disabled");
                             document.getElementById("button-top").classList.add("disabled");
-                            document.getElementById("button-topright").classList.add("disabled");
                         }
                     }
                 }
@@ -556,18 +418,23 @@
             xhr.send();
         }
 
-        function addPreset(name, preset) {
+        function isDisabled(button) {
+            return button.classList.contains("disabled");
+        }
+
+        function addPreset(name, preset) {            
             var temp = {
                 "text": name,
-                "value": preset.join(" "),
+                "value": preset,
                 "selected": true
             };
             presets.push(temp);
             updatePresets();
-            onClickSelect();
         }
 
         function updatePresets() {
+            var select = document.getElementById('presets-dropdown');
+
             for (a in select.options) {
                 select.options.remove(0);
             }
@@ -581,59 +448,29 @@
         }
 
         function updateInputFields() {
-            if (!(presetName && presetName.value)) {
+            var input = document.getElementById('presets-name');
+            var buttonRecord = document.getElementById('button-record');
+
+            if (!(input && input.value)) {
                 buttonRecord.classList.add("disabled");
             } else {
                 buttonRecord.classList.remove("disabled");
             }
-
-            if (select.value == "") {
-                buttonSend.classList.add("disabled");
-            } else {
-                buttonSend.classList.remove("disabled");
-            }
         }
 
-        function togglePresetsFunctionality(enable) {
-            if (!enable) {
-                pressedInput.value = "0.0s";
-                presetName.disabled = true;
+        function togglePresetsFunctionality(disable) {
+            var input = document.getElementById('presets-name');
+            var select = document.getElementById('presets-dropdown');
+            var buttonSend = document.getElementById('button-send');
+            if (disable) {
+                input.disabled = true;
                 select.disabled = true;
                 buttonSend.classList.add("disabled");
-            } else {
-                pressedInput.value = "...";
-                presetName.value = "";
-                presetName.disabled = false;
+            }
+            else {
+                input.disabled = false;
                 select.disabled = false;
                 buttonSend.classList.remove("disabled");
-            }
-        }
-
-        function toggleButtons(enable) {
-            if (!enable) {
-                buttons.forEach(element => {
-                    element.classList.add("disabled");
-                });
-            } else {
-                buttons.forEach(element => {
-                    element.classList.remove("disabled");
-                });
-            }
-        }
-
-        function onClickSelect() {
-            var text = select.value;
-            if (text == "") {
-                text = "...";
-            }
-            presetInputs.value = text;
-        }
-
-        function wait(ms) {
-            var start = new Date().getTime();
-            var end = start;
-            while (end < start + ms) {
-                end = new Date().getTime();
             }
         }
 
