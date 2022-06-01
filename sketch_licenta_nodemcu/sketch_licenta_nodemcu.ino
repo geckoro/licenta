@@ -6,8 +6,11 @@
 #include <ArduinoJson.h>
 
 
-const char* ssid = "DIGI_3fe7d8_Ext";
-const char* password = "a7eec018";
+const char* ssid = "MERCUSYS_1C33";
+const char* password = "bv06baii";
+
+//const char* ssid = "DIGI_3fe7d8_Ext";
+//const char* password = "a7eec018";
 
 //const char* ssid = "Redmi";
 //const char* password = "iotproject";
@@ -69,6 +72,16 @@ void setup() {
     if (!request->authenticate(http_username, http_password))
       return request->requestAuthentication();
     request->send(SPIFFS, "/controls.html", "text/html");
+  });
+
+  // Route to load style.css file
+  server.on("/styles.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/styles.css", "text/css");
+  });
+
+  // Route to load controls.js file
+  server.on("/controls.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/controls.js", "text/js");
   });
 
   server.on("/obstacleCheck", HTTP_GET, [](AsyncWebServerRequest * request) {

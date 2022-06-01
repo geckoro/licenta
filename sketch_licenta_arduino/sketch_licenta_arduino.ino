@@ -8,13 +8,14 @@
 // MOTOR - Motor
 // SERVO - Servomotor
 
-#define US_echoPin 2
-#define US_trigPin 3
-#define MOTOR_relay1 5
-#define MOTOR_relay2 6
-
-/* Variables */
-int decodedRemoteKey = 0;
+#define USEchoPin 2
+#define USTrigPin 3
+#define MOTORFirstRelayPin 4
+#define MOTORSecondRelayPin 5
+#define MOTORENA 6
+#define SERVOPin 7
+#define SERVOPositionInitial 105
+#define SERVOPositionOffset 30
 
 bool turnedOn = true;
 bool obstacleAnnounced = false;
@@ -23,74 +24,53 @@ bool turning = false;
 
 enum Direction {
   NONE,
-  LEFT,
-  RIGHT,
+  FORWARDLEFT,
   FORWARD,
-  BACKWARD
+  FORWARDRIGHT,
+  BACKWARDLEFT,
+  BACKWARD,
+  BACKWARDRIGHT
 };
 
 class MyMotor {
   private:
     Direction m_direction;
 
+  public:
     void Turn() {
       switch (m_direction) {
         case NONE:
-          digitalWrite(MOTOR_relay1, LOW);
-          digitalWrite(MOTOR_relay2, LOW);
+          digitalWrite(MOTORFirstRelayPin, LOW);
+          digitalWrite(MOTORSecondRelayPin, LOW);
           turning = false;
-          Serial.println("stop");
           break;
+        case FORWARDLEFT:
         case FORWARD:
-          digitalWrite(MOTOR_relay1, HIGH);
-          digitalWrite(MOTOR_relay2, LOW);
-          Serial.println("forward");
+        case FORWARDRIGHT:
+          digitalWrite(MOTORFirstRelayPin, HIGH);
+          digitalWrite(MOTORSecondRelayPin, LOW);
           break;
+        case BACKWARDLEFT:
         case BACKWARD:
-          digitalWrite(MOTOR_relay1, LOW);
-          digitalWrite(MOTOR_relay2, HIGH);
+        case BACKWARDRIGHT:
+          digitalWrite(MOTORFirstRelayPin, LOW);
+          digitalWrite(MOTORSecondRelayPin, HIGH);
           obstacleFound = false;
-          Serial.println("backward");
           Serial.print("00\n");
           break;
       }
     }
 
-  public:
     MyMotor() {
       m_direction = NONE;
     }
 
-    bool IsNotTurning() {
-      return m_direction == NONE;
+    void SetDirection(Direction value) {
+      m_direction = value;
     }
 
-    void ProcessInput(char input[3]) {
-      if (!turning && m_direction == NONE) {
-        return;
-      }
-      if (input[1] == '0') {
-        m_direction = NONE;
-      }
-      else {
-        switch (input[0]) {
-          case '2':
-            if (obstacleFound) {
-              m_direction = NONE;
-              break;
-            }
-            m_direction = FORWARD;
-            break;
-          case '5':
-            m_direction = BACKWARD;
-            break;
-          default:
-            m_direction = NONE;
-            break;
-        }
-      }
-
-      Turn();
+    bool IsNotTurning() {
+      return m_direction == NONE;
     }
 };
 
@@ -109,65 +89,98 @@ class MyServo {
       return m_direction == NONE;
     }
 
+    void SetDirection(Direction value) {
+      m_direction = value;
+    }
+
     void Attach(int pin) {
       m_servo.attach(pin);
-      m_position = 90;
+      m_position = SERVOPositionInitial;
     }
 
-    void Turn(int value) {
-      delay(10);
-      if (value > -20 && value < 20) {
-        if (m_direction != NONE && m_position != 90) {
-          ReturnToInitial();
-        }
-        return;
+    void Turn() {
+      switch (m_direction) {
+        case FORWARDLEFT:
+        case BACKWARDLEFT:
+          m_servo.write(SERVOPositionInitial - SERVOPositionOffset);
+          break;
+        case FORWARDRIGHT:
+        case BACKWARDRIGHT:
+          m_servo.write(SERVOPositionInitial + SERVOPositionOffset);
+          break;
+        default:
+          m_servo.write(SERVOPositionInitial);
+          break;
       }
-
-      if ((m_direction == LEFT || m_direction == NONE) && value < 0) {
-        if (m_position > 0) {
-          m_servo.write(--m_position);
-          m_direction = LEFT;
-        }
-        return;
-      }
-      if ((m_direction == RIGHT || m_direction == NONE)  && value > 0) {
-        if (m_position < 180) {
-          m_servo.write(++m_position);
-          m_direction = RIGHT;
-        }
-        return;
-      }
-
-      if (m_direction == LEFT && value > 0) {
-        ReturnToInitial();
-        m_direction = RIGHT;
-      }
-      else if (m_direction == RIGHT && value < 0) {
-        ReturnToInitial();
-        m_direction = LEFT;
-      }
-    }
-
-    void ReturnToInitial() {
-      if (m_direction == LEFT) {
-        for (int pos = m_position; pos <= 90; pos++) {
-          m_servo.write(pos);
-          delay(5);
-        }
-      }
-      else if (m_direction == RIGHT) {
-        for (int pos = m_position; pos >= 90; pos--) {
-          m_servo.write(pos);
-          delay(5);
-        }
-      }
-      m_direction = NONE;
-      m_position = 90;
     }
 };
 
-MyServo myServo;
-MyMotor myMotor;
+class MyCar {
+  private:
+    MyServo m_myServo;
+    MyMotor m_myMotor;
+    Direction m_direction;
+
+  public:
+    void Initialize() {
+      m_myServo.SetDirection(NONE);
+      m_myMotor.SetDirection(NONE);
+      m_myServo.Attach(SERVOPin);
+    }
+
+    void ProcessInput(char input[3]) {
+      if (!turning && m_direction == NONE) {
+        return;
+      }
+      if (input[1] == '0') {
+        m_direction = NONE;
+      }
+      else {
+        switch (input[0]) {
+          case '1':
+            if (obstacleFound) {
+              m_direction = NONE;
+              break;
+            }
+            m_direction = FORWARDLEFT;
+            break;
+          case '2':
+            if (obstacleFound) {
+              m_direction = NONE;
+              break;
+            }
+            m_direction = FORWARD;
+            break;
+          case '3':
+            if (obstacleFound) {
+              m_direction = NONE;
+              break;
+            }
+            m_direction = FORWARDRIGHT;
+            break;
+          case '4':
+            m_direction = BACKWARDLEFT;
+            break;
+          case '5':
+            m_direction = BACKWARD;
+            break;
+          case '6':
+            m_direction = BACKWARDRIGHT;
+            break;
+          default:
+            m_direction = NONE;
+            break;
+        }
+      }
+
+      m_myServo.SetDirection(m_direction);
+      m_myMotor.SetDirection(m_direction);
+      m_myServo.Turn();
+      m_myMotor.Turn();
+    }
+};
+
+MyCar myCar;
 
 const byte numChars = 3;
 char receivedChars[numChars];   // an array to store the received data
@@ -175,16 +188,19 @@ char receivedChars[numChars];   // an array to store the received data
 boolean newData = false;
 
 void setup() {
+  myCar.Initialize();
+  
   Serial.begin(115200);
-  // myServo.Attach(2);
 
-  pinMode(US_trigPin, OUTPUT);
-  pinMode(US_echoPin, INPUT);
+  pinMode(USTrigPin, OUTPUT);
+  pinMode(USEchoPin, INPUT);
+  pinMode(MOTORENA, OUTPUT);
+  pinMode(MOTORFirstRelayPin, OUTPUT);
+  pinMode(MOTORSecondRelayPin, OUTPUT);
+  digitalWrite(MOTORFirstRelayPin, LOW);
+  digitalWrite(MOTORSecondRelayPin, LOW);
 
-  pinMode(MOTOR_relay1, OUTPUT);
-  pinMode(MOTOR_relay2, OUTPUT);
-  digitalWrite(MOTOR_relay1, LOW);
-  digitalWrite(MOTOR_relay2, LOW);
+  analogWrite(MOTORENA, 190);
 }
 
 void loop() {
@@ -198,7 +214,7 @@ void loop() {
   recvWithEndMarker();
   processNewData();
 
-  myMotor.ProcessInput(receivedChars);
+  myCar.ProcessInput(receivedChars);
 }
 
 void recvWithEndMarker() {
@@ -237,14 +253,14 @@ void processNewData() {
 
 bool isObstacleAhead() {
   // Clears the trigPin condition
-  digitalWrite(US_trigPin, LOW);
+  digitalWrite(USTrigPin, LOW);
   delayMicroseconds(2);
   // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
-  digitalWrite(US_trigPin, HIGH);
+  digitalWrite(USTrigPin, HIGH);
   delayMicroseconds(10);
-  digitalWrite(US_trigPin, LOW);
+  digitalWrite(USTrigPin, LOW);
   // Reads the echoPin, returns the sound wave travel time in microseconds
-  long duration = pulseIn(US_echoPin, HIGH);
+  long duration = pulseIn(USEchoPin, HIGH);
   // Calculating the distance
   int distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
   // Displays the distance on the Serial Monitor
